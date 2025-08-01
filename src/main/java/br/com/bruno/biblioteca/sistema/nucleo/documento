@@ -1,0 +1,244 @@
+ivro
+package com.br.bruno.biblioteca.sistema;
+
+public class Livro {
+    private static int id = 0;
+    private String titulo;
+    private String autor;
+    private String isbn;
+    private int anoPublicacao;
+    private boolean disponivel;
+    private String emprestadoPara;
+    Membro membro;
+
+    public Livro(String isbn){
+        this.isbn = isbn;
+        this.id += 1;
+        this.disponivel = true;
+    }
+
+    public String getTitulo() {
+        return titulo;
+    }
+
+    public void setTitulo(String titulo){
+        this.titulo = titulo;
+    }
+
+    public String getAutor() {
+        return autor;
+    }
+
+    public void setAutor(String autor){
+        this.autor = autor;
+    }
+
+    public String getIsbn() {
+        return isbn;
+    }
+
+    public void setIsbn(String isbn){
+        this.isbn = isbn;
+    }
+
+    public int getAnoPublicacao() {
+        return anoPublicacao;
+    }
+
+    public void setAnoPublicacao(int anoPublicacao) {
+        this.anoPublicacao = anoPublicacao;
+    }
+
+    public boolean isDisponivel() {
+        return disponivel;
+    }
+
+    public void setDisponivel(boolean disponivel) {
+        this.disponivel = disponivel;
+    }
+
+    public String getEmprestadoPara() {
+        return emprestadoPara;
+    }
+
+    public void setEmprestadoPara(String membro) {
+        this.setDisponivel(false);
+        this.emprestadoPara = membro.toString();
+    }
+
+    @Override
+    public String toString() {
+        String mensagemRetorno = "Titulo: " + this.titulo + "\nAutor: " + this.autor +
+                "\nIsbn: " + this.isbn + "\nAno de publicacao: " + this.anoPublicacao;
+        if (disponivel) {
+            mensagemRetorno += "\nDisponível para locação.";
+        }else{
+            mensagemRetorno += "\nLocado por: " + this.getEmprestadoPara();
+        }
+        return mensagemRetorno;
+    }
+}
+--------------------------------------------------------------------------------------------
+package com.br.bruno.biblioteca.sistema;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
+
+public class Biblioteca {
+    Scanner input = new Scanner(System.in);
+    List<Livro> prateleira;
+    Livro novoLivro;
+    Membro membro;
+
+    public Biblioteca(){
+        prateleira = new ArrayList<>();
+    }
+
+    public void adicionarLivro(){
+        String varTemporaria = "";
+
+        System.out.println("Cadastro de livro: ");
+        System.out.println("Insira o isbn: ");
+        varTemporaria = input.nextLine();
+
+        novoLivro = new Livro(varTemporaria);
+        this.prateleira.add(novoLivro);
+
+        System.out.println("Insira o titulo do livro: ");
+        varTemporaria = input.nextLine();
+        prateleira.getLast().setTitulo(varTemporaria);
+        System.out.println("Insira o autor do livro: ");
+        varTemporaria = input.nextLine();
+        prateleira.getLast().setAutor(varTemporaria);
+        System.out.println("Insira o ano de publicação");
+        int anoPublicacao = input.nextInt();
+        input.nextLine();
+        prateleira.getLast().setAnoPublicacao(anoPublicacao);
+
+    }
+
+    public void listarLivros(){
+        if(prateleira.isEmpty()) System.out.println("Nada por enquanto!!");
+        System.out.println();
+
+        for(int a = 0; a <= prateleira.size() -1; a++){
+            System.out.println(prateleira.get(a).toString());
+            System.out.println("-----------------------------");
+        }
+    }
+
+    public void buscarLivroPorTitulo(){
+        String titulo = "";
+        int posicao = 0;
+
+        System.out.println("Insira o titulo do livro: ");
+        titulo = input.nextLine();
+//
+        for (int a = 0; a <= prateleira.size() - 1; a++){
+            if(titulo.equals(prateleira.get(a).getTitulo())){
+                posicao = a;
+            };
+        }
+        System.out.println(prateleira.get(posicao).toString());
+    }
+
+    public void buscarLivroPorAutor(){
+        String autor = "";
+        Livro livroEncontrado = null;
+
+        System.out.println("Insira o autor do livro: ");
+        autor = input.nextLine();
+        for(Livro livro : prateleira){
+            if(livro.getAutor().equalsIgnoreCase(autor)){
+                livroEncontrado = livro;
+                break;
+            }
+        }
+        if(livroEncontrado != null){
+            System.out.println(livroEncontrado.toString());
+        }
+    }
+
+    public void emprestarLivro(){
+        String isbn = "";
+        String nome = "" ;
+        String idMembro = "";
+
+        System.out.println("Insira o isbn do livro: ");
+        isbn = input.next();
+        for(Livro livro: prateleira){
+            if(livro.getIsbn().equals(isbn)){
+                if (livro.isDisponivel()){
+                    livro.setDisponivel(false);
+
+                    System.out.println("Insira o nome do membro: ");
+                    nome = input.next();
+                    System.out.println("Insira o id de membro:");
+                    idMembro = input.next();
+
+                    livro.setEmprestadoPara(nome);
+                }else{
+                    System.out.println("Erro de pesquisa, livro não encontrado!");
+                }
+            }
+        }
+
+    }
+
+    public void devolverLivro(){
+        System.out.println("Insira o isbn do livro que deseja devolver");
+        String isbn = input.next();
+
+        for(Livro livro: prateleira){
+            if(livro.getIsbn().equals(isbn)){
+                livro.setDisponivel(true);
+                livro.setEmprestadoPara("");
+            }
+        }
+    }
+
+    public void removerLivro(){
+        String isbn;
+        int posicao = -1;
+
+        System.out.println("Insira o isbn do livro: ");
+        isbn = input.next();
+        for(int a = 0; a < prateleira.size(); a++){
+            if(prateleira.get(a).getIsbn().equalsIgnoreCase(isbn)){
+                posicao = a;
+            }
+        }
+       if(posicao != -1){
+           prateleira.remove(posicao);
+       }
+    }
+
+}
+---------------------------------------------------------------------------------------
+Membro
+package com.br.bruno.biblioteca.sistema;
+
+public class Membro {
+    private String nome;
+    private String idMembro;
+
+    public Membro(String nome, String id){
+        this.nome = nome;
+        this.idMembro = id;
+    }
+
+    public String getNome(){
+        return this.nome;
+    }
+
+    public String getIdMembro(){
+        return this.idMembro;
+    }
+
+    @Override
+    public String toString() {
+        String mensagem = "Nome: " + this.nome + "\nId: " + this.idMembro;
+        return mensagem;
+    }
+}
